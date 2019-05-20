@@ -1,20 +1,28 @@
+import Routing
 import Vapor
 
 /// Register your application's routes here.
+///
+/// [Learn More →](https://docs.vapor.codes/3.0/getting-started/structure/#routesswift)
 public func routes(_ router: Router) throws {
-    // Basic "It works" example
-    router.get { req in
-        return "It works!"
+    router.get { req -> Future<View> in
+        return try req.view().render("test")
     }
     
-    // Basic "Hello, world!" example
-    router.get("hello") { req in
-        return "Hello, world!"
+    router.get("test") { req -> Future<View> in
+        return Order.query(on: req).all().flatMap(to: View.self) { orders in
+            return try req.view().render("home", ["orders" : orders])
+        }
     }
-
-    // Example of configuring a controller
-    let todoController = TodoController()
-    router.get("todos", use: todoController.index)
-    router.post("todos", use: todoController.create)
-    router.delete("todos", Todo.parameter, use: todoController.delete)
+    
+    router.get("getOrders") { req -> Future<[Order]> in
+        return Order.query(on: req).all()
+    }
+    
+    router.post(Order.self, at: "order") { (request, order) -> Future<Order> in
+        print(order)
+        var orderCopy = order
+        orderCopy.date = Date()
+        return orderCopy.save(on: request)
+    }
 }
