@@ -9,7 +9,7 @@ import Foundation
 import Vapor
 import FluentSQLite
 
-struct Order: Content, SQLiteModel, Migration {
+struct Order: Content, SQLiteModel, Migration, Parameter {
     var id: Int?
     var products: [[String : Int]]
     var buyerName: String

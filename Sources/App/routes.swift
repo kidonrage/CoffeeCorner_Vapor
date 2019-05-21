@@ -9,20 +9,6 @@ public func routes(_ router: Router) throws {
         return try req.view().render("test")
     }
     
-    router.get("test") { req -> Future<View> in
-        return Order.query(on: req).all().flatMap(to: View.self) { orders in
-            return try req.view().render("home", ["orders" : orders])
-        }
-    }
-    
-    router.get("getOrders") { req -> Future<[Order]> in
-        return Order.query(on: req).all()
-    }
-    
-    router.post(Order.self, at: "order") { (request, order) -> Future<Order> in
-        print(order)
-        var orderCopy = order
-        orderCopy.date = Date()
-        return orderCopy.save(on: request)
-    }
+    let ordersController = OrdersController()
+    try router.register(collection: ordersController)
 }
